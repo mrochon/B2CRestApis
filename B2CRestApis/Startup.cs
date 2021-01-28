@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Client;
+using B2CRestApis.Services;
 
 namespace B2CRestApis
 {
@@ -26,6 +27,10 @@ namespace B2CRestApis
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<SymetricKeyOptions>(Configuration.GetSection("SymetricKey"));
+            services.AddScoped<IBasicAuthenticationService, SymmetricKeyAuthentication>();
+            services.AddAuthentication(BasicAuthenticationDefaults.AuthenticationScheme)
+                .AddBasicAuthentication();
             services.AddSingleton<IConfidentialClientApplication>((svc) =>
             {
                 ConfidentialClientApplicationOptions options = new ConfidentialClientApplicationOptions();
@@ -69,6 +74,7 @@ namespace B2CRestApis
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

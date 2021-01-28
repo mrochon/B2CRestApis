@@ -1,4 +1,5 @@
 ﻿using B2CRestApis.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -24,6 +25,7 @@ namespace B2CRestApis.Controllers
             _clientFactory = clientFactory;
         }
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult> Send([FromBody] OTPEmail otp)
         {
             using (_logger.BeginScope("Send email", otp))
