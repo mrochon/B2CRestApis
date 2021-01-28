@@ -46,9 +46,9 @@ namespace B2CRestApis.Controllers
             if (string.Compare(cred.userId, cred.password) == 0)
             {
                 string id = String.Empty;
-                using (var http = _clientFactory.CreateClient("graph"))
+                using (var http = _clientFactory.CreateClient("B2C"))
                 {
-                    //var http = _clientFactory.CreateClient("graph");
+                    //var http = _clientFactory.CreateClient("B2C");
                     var resp = await http.SendAsync(
                         new HttpRequestMessage(HttpMethod.Get, http.BaseAddress + $"users?$select=id&$filter=identities/any(c:c/issuerAssignedId eq '{cred.userId}' and c/issuer eq 'mrochonb2cprod.onmicrosoft.com')"));
                     if (resp.IsSuccessStatusCode)

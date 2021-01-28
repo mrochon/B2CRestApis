@@ -12,6 +12,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Client;
 using B2CRestApis.Services;
+using System.Net.Http;
 
 namespace B2CRestApis
 {
@@ -31,35 +32,24 @@ namespace B2CRestApis
             services.AddScoped<IBasicAuthenticationService, SymmetricKeyAuthentication>();
             services.AddAuthentication(BasicAuthenticationDefaults.AuthenticationScheme)
                 .AddBasicAuthentication();
-            services.AddSingleton<IConfidentialClientApplication>((svc) =>
-            {
-                ConfidentialClientApplicationOptions options = new ConfidentialClientApplicationOptions();
-                Configuration.Bind("AAD", options);
-                return ConfidentialClientApplicationBuilder
-                    .CreateWithApplicationOptions(options)
-                    .Build();
-            });
-            services.AddHttpClient("graph", (s,c) =>
-            {
-                var msal = s.GetService<IConfidentialClientApplication>();
-                var tokens = msal.AcquireTokenForClient(new string[] { "https://graph.microsoft.com/.default" }).ExecuteAsync().Result;
-                c.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", tokens.AccessToken);
-                c.BaseAddress = new Uri("https://graph.microsoft.com/v1.0/");
-                c.DefaultRequestHeaders.Add("Accept", "application/json");
-            });
-            services.AddHttpClient("O365", (s, c) =>
-            {
-                var options = new ConfidentialClientApplicationOptions();
-                Configuration.Bind("O365", options);
-                var msal = ConfidentialClientApplicationBuilder
-                    .CreateWithApplicationOptions(options)
-                    .Build();
-                var tokens = msal.AcquireTokenForClient(new string[] { "https://graph.microsoft.com/.default" }).ExecuteAsync().Result;
-                c.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", tokens.AccessToken);
-                c.BaseAddress = new Uri("https://graph.microsoft.com/v1.0/");
-                c.DefaultRequestHeaders.Add("Accept", "application/json");
-            });
+
+            services.AddHttpClient("B2C", (s,c) => SetupGraphClient("AAD", c));
+            services.AddHttpClient("O365", (s, c) => SetupGraphClient("O365", c));
+
             services.AddControllers();
+        }
+
+        private void SetupGraphClient(string sectionName, HttpClient c)
+        {
+            var options = new ConfidentialClientApplicationOptions();
+            Configuration.Bind(sectionName, options);
+            var msal = ConfidentialClientApplicationBuilder
+                .CreateWithApplicationOptions(options)
+                .Build();
+            var tokens = msal.AcquireTokenForClient(new string[] { "https://graph.microsoft.com/.default" }).ExecuteAsync().Result;
+            c.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", tokens.AccessToken);
+            c.BaseAddress = new Uri("https://graph.microsoft.com/v1.0/");
+            c.DefaultRequestHeaders.Add("Accept", "application/json");
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
