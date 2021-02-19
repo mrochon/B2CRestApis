@@ -28,7 +28,7 @@ namespace B2CRestApis.Controllers
             {
                 var domain_hint = JsonDocument.Parse(json).RootElement.GetProperty("DomainName").GetString();
                 if (String.Compare(domain_hint, "live.com") != 0)
-                    return new JsonResult(new { tp = "aad", domain_hint });
+                    return new JsonResult(new { email, tp = "aad", domain_hint });
             }
             catch
             {
