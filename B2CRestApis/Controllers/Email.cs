@@ -17,9 +17,9 @@ namespace B2CRestApis.Controllers
     [ApiController]
     public class Email : ControllerBase
     {
-        private readonly ILogger<Identity> _logger;
+        private readonly ILogger<Email> _logger;
         private readonly IHttpClientFactory _clientFactory;
-        public Email(ILogger<Identity> logger, IHttpClientFactory clientFactory)
+        public Email(ILogger<Email> logger, IHttpClientFactory clientFactory)
         {
             _logger = logger;
             _clientFactory = clientFactory;
