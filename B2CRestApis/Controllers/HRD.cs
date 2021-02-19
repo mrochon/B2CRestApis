@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -12,6 +13,7 @@ namespace B2CRestApis.Controllers
 {
     [Route("[controller]")]
     [ApiController]
+    [Authorize]
     public class HRD : ControllerBase
     {
         private readonly ILogger<HRD> _logger;
@@ -19,7 +21,7 @@ namespace B2CRestApis.Controllers
         {
             _logger = logger;
         }
-        //[Authorize]
+
         public async Task<ActionResult> GetDomainHint(string email)
         {
             var http = new HttpClient();
